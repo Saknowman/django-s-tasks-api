@@ -15,6 +15,7 @@ DEFAULTS = {
         'DETAIL_DEFAULT': '',
         'STATUS_DEFAULT': 1,
     },
+    'TASK_STATUS_PERMISSION_CLASSES': ['rest_framework.permissions.IsAdminUser'],
     'TASK_TAG_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
         's_tasks_api.permissions.task_tags.OnlyAdminCanChange'
