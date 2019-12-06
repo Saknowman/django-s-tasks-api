@@ -13,8 +13,11 @@ DEFAULTS = {
         'TITLE_MAX_LENGTH': 100,
         'TITLE_DEFAULT': '',
         'DETAIL_DEFAULT': '',
-        'STATUS_DEFAULT': 1,
+        'STATUS_DEFAULT_PK': 1,
     },
+    'TASK_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated'
+    ],
     'TASK_STATUS_PERMISSION_CLASSES': ['rest_framework.permissions.IsAdminUser'],
     'TASK_TAG_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
