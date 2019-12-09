@@ -2,11 +2,17 @@ from django.urls import reverse
 
 from ..utils import BaseApiTestCase, User
 
+LIST_TASK_URL = reverse('tasks:tasks-list')
 ADD_TASK_URL = reverse('tasks:tasks-list')
+DETAIL_TASK_URL_NAME = 'tasks:tasks-detail'
+
+
+def get_detail_task_url(pk):
+    return reverse(DETAIL_TASK_URL_NAME, args=[pk])
 
 
 class BaseTaskTestCase(BaseApiTestCase):
-    fixtures = ['test_users.json', 'default_task_status_data.json', 'default_task_tags_data.json']
+    fixtures = ['test_users.json', 'default_task_status_data.json', 'test_task_tags_data.json', 'test_tasks_data.json']
 
     def setUp(self):
         super().setUp()

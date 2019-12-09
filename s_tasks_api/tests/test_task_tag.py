@@ -69,7 +69,7 @@ class AddTaskTagTestCase(BaseTaskTagTestCase):
 
 
 class ReadTaskTagTestCase(BaseTaskTagTestCase):
-    fixtures = ['test_users.json', 'default_task_tags_data.json']
+    fixtures = ['test_users.json', 'test_task_tags_data.json']
 
     def test_read_task_tag_list___without_authentication___return_404(self):
         # Arrange
@@ -111,7 +111,7 @@ class ReadTaskTagTestCase(BaseTaskTagTestCase):
 
 
 class ChangeTaskTagTestCase(BaseTaskTagTestCase):
-    fixtures = ['test_users.json', 'default_task_tags_data.json']
+    fixtures = ['test_users.json', 'test_task_tags_data.json']
 
     def test_change_task_tag___some_users_login___only_admin_user_can_change(self):
         # Arrange
@@ -164,7 +164,7 @@ class ChangeTaskTagTestCase(BaseTaskTagTestCase):
 
 
 class DeleteTaskTagTestCase(BaseTaskTagTestCase):
-    fixtures = ['test_users.json', 'default_task_tags_data.json']
+    fixtures = ['test_users.json', 'test_task_tags_data.json']
 
     def test_delete_task_tag___some_users_login___only_admin_user_can_delete(self):
         # Arrange

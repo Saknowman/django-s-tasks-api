@@ -2,6 +2,7 @@ from django.http import Http404
 from django.utils.module_loading import import_string
 from rest_framework import viewsets, exceptions
 
+from s_tasks_api.services.tasks import get_tasks
 from s_tasks_api.settings import api_settings
 from .models import Task, TaskStatus, TaskTag
 from .serializers import TaskSerializer, TaskStatusSerializer, TaskTagSerializer
@@ -34,10 +35,12 @@ class TaskViewSet(Response403To401Mixin, viewsets.ModelViewSet):
     serializer_class = TaskSerializer
     permission_classes = [import_string(p_c) for p_c in api_settings.TASK_PERMISSION_CLASSES]
 
+    def get_queryset(self):
+        return get_tasks(self.request.user, self.queryset)
+
     def perform_create(self, serializer):
         from s_tasks_api.services.task_status import get_task_status_from_or_default
-        print(get_task_status_from_or_default(serializer.validated_data))
-        result = serializer.save(
+        serializer.save(
             created_by=self.request.user,
             status=get_task_status_from_or_default(serializer.validated_data)
         )

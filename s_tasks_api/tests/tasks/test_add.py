@@ -1,6 +1,5 @@
-from django.urls import reverse
 from django.utils import timezone
-from rest_framework import test, status
+from rest_framework import status
 
 from s_tasks_api.models import TaskStatus, Task
 from ...settings import api_settings
