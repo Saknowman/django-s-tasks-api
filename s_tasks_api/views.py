@@ -35,6 +35,9 @@ class TaskViewSet(Response403To401Mixin, viewsets.ModelViewSet):
     permission_classes = [import_string(p_c) for p_c in api_settings.TASK_PERMISSION_CLASSES]
 
     def perform_create(self, serializer):
-        from s_tasks_api.tests.services.task_status import get_task_status_from_or_default
+        from s_tasks_api.services.task_status import get_task_status_from_or_default
         print(get_task_status_from_or_default(serializer.validated_data))
-        serializer.save(status=get_task_status_from_or_default(serializer.validated_data))
+        result = serializer.save(
+            created_by=self.request.user,
+            status=get_task_status_from_or_default(serializer.validated_data)
+        )

@@ -25,5 +25,6 @@ class TaskSerializer(serializers.ModelSerializer):
                   'created_by')
         read_only_fields = ('pk', 'created_date', 'created_by',)
         extra_kwargs = {
+            'title': {'required': True},
             'status': {'required': False}
         }
