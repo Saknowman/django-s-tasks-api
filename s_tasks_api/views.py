@@ -1,8 +1,12 @@
 from django.http import Http404
 from django.utils.module_loading import import_string
 from rest_framework import viewsets, exceptions
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.exceptions import ValidationError
 
-from s_tasks_api.services.tasks import get_tasks
+from s_tasks_api.services.tasks import get_tasks, get_task, complete_task, un_complete_task
 from s_tasks_api.settings import api_settings
 from .models import Task, TaskStatus, TaskTag
 from .serializers import TaskSerializer, TaskStatusSerializer, TaskTagSerializer
@@ -44,3 +48,15 @@ class TaskViewSet(Response403To401Mixin, viewsets.ModelViewSet):
             created_by=self.request.user,
             status=get_task_status_from_or_default(serializer.validated_data)
         )
+
+    @action(detail=True, methods=['patch'])
+    def complete(self, request, *args, **kwargs):
+        task = complete_task(request.user, kwargs['pk'])
+        serializer = self.get_serializer(task)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['patch'])
+    def un_complete(self, request, *args, **kwargs):
+        task = un_complete_task(request.user, kwargs['pk'])
+        serializer = self.get_serializer(task)
+        return Response(serializer.data)
