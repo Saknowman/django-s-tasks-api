@@ -3,16 +3,18 @@ from django.utils.module_loading import import_string
 from rest_framework import viewsets, exceptions
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework.exceptions import ValidationError
 
-from s_tasks_api.services.tasks import get_tasks, get_task, complete_task, un_complete_task
+from s_tasks_api.services.tasks import get_tasks, complete_task, un_complete_task
 from s_tasks_api.settings import api_settings
 from .models import Task, TaskStatus, TaskTag
 from .serializers import TaskSerializer, TaskStatusSerializer, TaskTagSerializer
 
 
+# noinspection PyMethodMayBeStatic
 class Response403To401Mixin:
+    def __init__(self):
+        pass
+
     def permission_denied(self, request, message=None):
         if message is None:
             raise Http404

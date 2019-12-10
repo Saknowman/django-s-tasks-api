@@ -1,8 +1,8 @@
 from django.urls import reverse
-from rest_framework import test, status
+from rest_framework import status
 
 from s_tasks_api.models import TaskStatus
-from .utils import BaseApiTestCase, User
+from .utils import BaseApiTestCase, User, validation_error_status
 from ..settings import api_settings
 
 LIST_TASK_STATUS_URL = reverse('tasks:status-list')
@@ -71,7 +71,7 @@ class AddTaskStatusTestCase(BaseTaskStatusTestCase):
                 # Act
                 response = self.client.post(LIST_TASK_STATUS_URL, parameters['parameters'])
                 # Assert
-                self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code, response.data)
+                self.assertEqual(validation_error_status, response.status_code, response.data)
                 self.assertTrue('value' in response.data.keys())
                 self.assertEqual(parameters['validation_code'], response.data['value'][0].code)
 
@@ -173,7 +173,7 @@ class ChangeTaskStatusTestCase(BaseTaskStatusTestCase):
                 # Act
                 response = self.client.put(detail_task_status_url_by(tag_pk), parameters['parameters'])
                 # Assert
-                self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code, response.data)
+                self.assertEqual(validation_error_status, response.status_code, response.data)
                 self.assertTrue('value' in response.data.keys())
                 self.assertEqual(parameters['validation_code'], response.data['value'][0].code)
 

@@ -2,6 +2,7 @@ from django.utils import timezone
 from rest_framework import status
 
 from s_tasks_api.models import TaskStatus, Task
+from s_tasks_api.tests.utils import validation_error_status
 from ...settings import api_settings
 from .utils import BaseTaskTestCase, ADD_TASK_URL
 
@@ -54,8 +55,8 @@ class AddTaskTestCase(BaseTaskTestCase):
                 'validation_errors': {'title': 'max_length'}
             },
             {
-                'parameters': {'title': 'aaa', 'due_date': '999', 'completed_date': 'aaa', 'completed': 'aa'},
-                'validation_errors': {'due_date': 'invalid', 'completed_date': 'invalid', 'completed': 'invalid'}
+                'parameters': {'title': 'aaa', 'due_date': '999'},
+                'validation_errors': {'due_date': 'invalid'}
             },
             {
                 'parameters': {'title': 'aaa', 'status': '999', 'tag': '999'},
@@ -68,7 +69,7 @@ class AddTaskTestCase(BaseTaskTestCase):
                 # Act
                 response = self.client.post(ADD_TASK_URL, test_data['parameters'])
                 # Assert
-                self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code, response.data)
+                self.assertEqual(validation_error_status, response.status_code, response.data)
                 for key, code in test_data['validation_errors'].items():
                     self.assertTrue(key in response.data.keys(), response.data)
                     self.assertEqual(code, response.data[key][0].code, response.data)

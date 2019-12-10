@@ -3,7 +3,6 @@ from rest_framework import routers
 
 from .views import TaskViewSet, TaskStatusViewSet, TaskTagViewSet
 
-
 router = routers.DefaultRouter()
 router.register(r'status', TaskStatusViewSet, 'status')
 router.register(r'tags', TaskTagViewSet, 'tags')

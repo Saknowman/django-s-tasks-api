@@ -1,6 +1,5 @@
 from rest_framework import serializers
 
-from s_tasks_api.settings import api_settings
 from .models import Task, TaskStatus, TaskTag
 
 

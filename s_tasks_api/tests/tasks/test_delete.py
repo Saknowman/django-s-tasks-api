@@ -1,4 +1,3 @@
-from django.utils import timezone
 from rest_framework import status
 
 from s_tasks_api.models import Task
