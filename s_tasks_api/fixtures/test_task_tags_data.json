@@ -1,0 +1,30 @@
+[
+  {
+    "model": "s_tasks_api.taskTag",
+    "pk": 1,
+    "fields": {
+      "value": "tag1"
+    }
+  },
+  {
+    "model": "s_tasks_api.taskTag",
+    "pk": 2,
+    "fields": {
+      "value": "tag2"
+    }
+  },
+  {
+    "model": "s_tasks_api.taskTag",
+    "pk": 3,
+    "fields": {
+      "value": "tag3"
+    }
+  },
+  {
+    "model": "s_tasks_api.taskTag",
+    "pk": 4,
+    "fields": {
+      "value": "tag4"
+    }
+  }
+]

@@ -1,0 +1,30 @@
+[
+  {
+    "model": "s_tasks_api.taskStatus",
+    "pk": 1,
+    "fields": {
+      "value": "Backlog"
+    }
+  },
+  {
+    "model": "s_tasks_api.taskStatus",
+    "pk": 2,
+    "fields": {
+      "value": "Ready"
+    }
+  },
+  {
+    "model": "s_tasks_api.taskStatus",
+    "pk": 3,
+    "fields": {
+      "value": "In progress"
+    }
+  },
+  {
+    "model": "s_tasks_api.taskStatus",
+    "pk": 4,
+    "fields": {
+      "value": "Done"
+    }
+  }
+]
