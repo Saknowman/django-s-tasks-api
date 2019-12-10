@@ -12,9 +12,6 @@ from .serializers import TaskSerializer, TaskStatusSerializer, TaskTagSerializer
 
 # noinspection PyMethodMayBeStatic
 class Response403To401Mixin:
-    def __init__(self):
-        pass
-
     def permission_denied(self, request, message=None):
         if message is None:
             raise Http404
