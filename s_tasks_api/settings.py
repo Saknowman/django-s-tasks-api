@@ -16,7 +16,16 @@ DEFAULTS = {
         'STATUS_DEFAULT_PK': 1,
     },
     'TASK_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated'
+        'rest_framework.permissions.IsAuthenticated',
+        's_tasks_api.permissions.tasks.IsMyTask',
+        's_tasks_api.permissions.common.IsUserInGroup',
+        's_tasks_api.permissions.tasks.IsAssigneeInTaskGroup'
+    ],
+    'GROUP_TASK_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+        's_tasks_api.permissions.tasks.IsMyTask',
+        's_tasks_api.permissions.common.IsUserInGroup',
+        's_tasks_api.permissions.tasks.IsAssigneeInTaskGroup'
     ],
     'TASK_STATUS_PERMISSION_CLASSES': ['rest_framework.permissions.IsAdminUser'],
     'TASK_TAG_PERMISSION_CLASSES': [

@@ -1,3 +1,5 @@
+from django.contrib.auth.models import Group
+from django.core import validators
 from django.db import models
 from django.conf import settings
 
@@ -32,3 +34,39 @@ class Task(models.Model):
 
     def __str__(self):
         return "{tag}/{title}:{status}".format(title=self.title, status=self.status, tag=self.tag)
+
+
+class GroupTask(models.Model):
+    # Task Lock Level
+    NON_LOCK = 0b0
+    TITLE_LOCK = 0b1
+    DETAIL_LOCK = 0b1 << 1
+    DUE_DATE_LOCK = 0b1 << 2
+    STATUS_LOCK = 0b1 << 3
+    TAG_LOCK = 0b1 << 4
+    COMPLETED_LOCK = 0b1 << 5
+    FULL_LOCK = NON_LOCK | TITLE_LOCK | DETAIL_LOCK | DUE_DATE_LOCK | STATUS_LOCK | TAG_LOCK | COMPLETED_LOCK
+
+    # Assign Lock Level
+    ASSIGN_LOCK_NON = 0b0
+    ASSIGN_LOCK_MEMBERS = 0b1
+    ASSIGN_LOCK_ASSIGNEE = 0b1 << 1
+    ASSIGN_LOCK_CREATED_USER = 0b1 << 2
+    ASSIGN_FULL_LOCK = ASSIGN_LOCK_MEMBERS | ASSIGN_LOCK_ASSIGNEE | ASSIGN_LOCK_CREATED_USER
+
+    task = models.OneToOneField(to=Task, related_name='group_task', on_delete=models.CASCADE)
+    group = models.ForeignKey(to=Group, related_name='group_tasks', on_delete=models.CASCADE)
+    assignee = models.ForeignKey(to=settings.AUTH_USER_MODEL, null=True, blank=True, default=None,
+                                 on_delete=models.SET_DEFAULT)
+    lock_level = models.IntegerField(default=NON_LOCK, validators=[
+        validators.MinValueValidator(NON_LOCK),
+        validators.MaxValueValidator(FULL_LOCK)
+    ])
+    assign_lock_level = models.IntegerField(default=ASSIGN_LOCK_NON,
+                                            validators=[
+                                                validators.MinValueValidator(ASSIGN_LOCK_MEMBERS),
+                                                validators.MaxValueValidator(ASSIGN_FULL_LOCK)
+                                            ])
+
+    def __str__(self):
+        return self.group.name + ':' + self.task.title

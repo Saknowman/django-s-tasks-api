@@ -1,17 +1,19 @@
+from django.db import transaction
 from django.http import Http404
 from django.utils.module_loading import import_string
-from rest_framework import viewsets, exceptions
+from rest_framework import viewsets, exceptions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from s_tasks_api.services.tasks import get_tasks, complete_task, un_complete_task
 from s_tasks_api.settings import api_settings
-from .models import Task, TaskStatus, TaskTag
-from .serializers import TaskSerializer, TaskStatusSerializer, TaskTagSerializer
+from .models import Task, TaskStatus, TaskTag, GroupTask
+from .serializers import TaskSerializer, TaskStatusSerializer, TaskTagSerializer, GroupTaskSerializer
+from .services.utils import add_items_at_query_dict
 
 
-# noinspection PyMethodMayBeStatic
 class Response403To401Mixin:
+    # noinspection PyMethodMayBeStatic
     def permission_denied(self, request, message=None):
         if message is None:
             raise Http404
@@ -59,3 +61,23 @@ class TaskViewSet(Response403To401Mixin, viewsets.ModelViewSet):
         task = un_complete_task(request.user, kwargs['pk'])
         serializer = self.get_serializer(task)
         return Response(serializer.data)
+
+    @action(detail=False, methods=['post'])
+    def create_group_task(self, request, *args, **kwargs):
+        with transaction.atomic():
+            result = self.create(request, *args, **kwargs)
+            if result.status_code is not status.HTTP_201_CREATED:
+                return result
+            task = Task.objects.get(pk=result.data['pk'])
+            query_dict = add_items_at_query_dict(request.data, {'task_id': task.pk})
+            group_task_serializer = GroupTaskSerializer(data=query_dict)
+            group_task_serializer.is_valid(raise_exception=True)
+            super().perform_create(group_task_serializer)
+            headers = self.get_success_headers(group_task_serializer.data)
+            return Response(group_task_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+
+class GroupTaskViewSet(Response403To401Mixin, viewsets.ModelViewSet):
+    queryset = GroupTask.objects.all()
+    serializer_class = GroupTaskSerializer
+    permission_classes = [import_string(p_c) for p_c in api_settings.GROUP_TASK_PERMISSION_CLASSES]
