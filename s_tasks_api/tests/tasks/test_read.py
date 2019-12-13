@@ -1,3 +1,4 @@
+from django.db.models import Q
 from rest_framework import status
 
 from s_tasks_api.models import Task, GroupTask
@@ -30,10 +31,13 @@ class ReadTaskTestCase(BaseTaskTestCase):
         for user in users:
             with self.subTest(user=user):
                 self.client.force_login(user)
-                expected_tasks = Task.objects.filter(created_by=user.pk).all()
+                expected_tasks = [task for task in Task.objects.filter(created_by=user.pk).all()]
+                expected_tasks += [group_task.task for group_task in GroupTask.objects.filter(assignee=user.pk).all()]
+                expected_tasks = set(expected_tasks)
                 # Act
                 response = self.client.get(LIST_TASK_URL)
                 # Assert
+                self.assertEqual(len(expected_tasks), len(response.data), response.data)
                 for index, expected_task in enumerate(expected_tasks):
                     self.assertEqual(expected_task.pk, response.data[index]['pk'])
 

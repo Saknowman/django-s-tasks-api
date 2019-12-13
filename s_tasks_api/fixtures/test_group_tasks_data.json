@@ -56,7 +56,7 @@
       "created_date": "2019-12-11",
       "completed": true,
       "completed_date": "2019-12-25",
-      "created_by": 2
+      "created_by": 3
     }
   },
   {
@@ -95,7 +95,7 @@
     "fields": {
       "task": 1,
       "group": 1,
-      "assignee": null,
+      "assignee": 2,
       "lock_level": 0,
       "assign_lock_level": 1
     }

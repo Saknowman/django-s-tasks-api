@@ -1,5 +1,5 @@
 from django.utils import timezone
-
+from django.db.models import Q
 from ..models import Task, GroupTask
 
 
@@ -12,7 +12,7 @@ def get_task(user, pk):
 
 def get_tasks(user, tasks=None):
     tasks = tasks if tasks is not None else Task.objects.all()
-    return tasks.filter(created_by=user)
+    return tasks.filter(Q(created_by=user.pk) | Q(group_task__assignee=user.pk))
 
 
 def get_group_tasks(user, group_tasks=None):
@@ -23,6 +23,10 @@ def get_group_tasks(user, group_tasks=None):
 def is_my_task(user, task):
     created_user = get_created_user(task)
     return user == created_user
+
+
+def is_i_assignee(user, task):
+    return task in [group_task.task for group_task in GroupTask.objects.filter(assignee=user).all()]
 
 
 def is_my_group_task(user, task):

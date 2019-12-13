@@ -8,17 +8,46 @@ from .utils import BaseTaskTestCase, get_detail_task_url, get_detail_group_task_
 class DeleteTaskTestCase(BaseTaskTestCase):
     def test_delete_task___my_task___204_and_deleted(self):
         # Arrange
-        task = Task.objects.all()[0]
+        task = Task.objects.first()
         # Act
         response = self.client.delete(get_detail_task_url(task.pk))
         # Assert
+        self._assert_success_delete_task(response, task)
+
+    def _assert_success_delete_task(self, response, task):
         self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
         self.assertFalse(Task.objects.filter(pk=task.pk).exists())
+
+    def test_delete_task___i_assign_task___204_and_deleted(self):
+        # Arrange
+        task = Task.objects.filter(created_by=self.member_2, group_task__assignee=self.member_1).first()
+        # Act
+        response = self.client.delete(get_detail_task_url(task.pk))
+        # Assert
+        self._assert_success_delete_task(response, task)
+
+    def test_delete_task___i_assign_task_but_delete_locked___204_and_deleted(self):
+        # Arrange
+        task = Task.objects.filter(created_by=self.member_2, group_task__assignee=self.member_1).first()
+        task.group_task.lock_level = GroupTask.DELETE_LOCK
+        task.group_task.save()
+        # Act
+        response = self.client.delete(get_detail_task_url(task.pk))
+        # Assert
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
+
+    def test_delete_task___my_group_task___204_and_deleted(self):
+        # Arrange
+        task = Task.objects.filter(created_by=self.member_2, group_task__assignee=self.member_1).first()
+        # Act
+        response = self.client.delete(get_detail_task_url(task.pk))
+        # Assert
+        self._assert_success_delete_task(response, task)
 
     def test_delete_task___without_authentication___404(self):
         # Arrange
         self.client.logout()
-        task = Task.objects.all()[0]
+        task = Task.objects.first()
         # Act
         response = self.client.delete(get_detail_task_url(task.pk))
         # Assert

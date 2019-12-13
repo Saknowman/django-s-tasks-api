@@ -1,8 +1,9 @@
+from django.db.models import Q
 from django.utils import timezone
 from rest_framework import status
 
 from s_tasks_api.models import Task, GroupTask, TaskStatus, TaskTag
-from s_tasks_api.services.tasks import get_tasks, complete_task
+from s_tasks_api.services.tasks import get_tasks, complete_task, un_complete_task
 from s_tasks_api.settings import api_settings
 from s_tasks_api.tests.utils import validation_error_status
 from .utils import BaseTaskTestCase, get_detail_task_url, get_complete_task_url, get_un_complete_task_url, \
@@ -23,11 +24,41 @@ class ChangeTaskTestCase(BaseTaskTestCase):
         parameters = {
             'title': 'changed', 'detail': 'changed detail',
             'due_date': '2100-10-10', 'status': 3, 'tag': 3}
-        task = Task.objects.all()[0]
+        task = Task.objects.first()
         # Act
         response = self.client.put(get_detail_task_url(task.pk), parameters)
         task_in_db = Task.objects.get(pk=task.pk)
         # Assert
+        self._assert_success_change_parameters_correctly(parameters, response, task_in_db)
+
+    def test_change_task___i_assign_with_good_parameters___200_and_changed_task_detail(self):
+        # Arrange
+        parameters = {
+            'title': 'changed', 'detail': 'changed detail',
+            'due_date': '2100-10-10', 'status': 3, 'tag': 3}
+        task = Task.objects.filter(created_by=self.member_2, group_task__assignee=self.member_1).first()
+        # Act
+        response = self.client.put(get_detail_task_url(task.pk), parameters)
+        task_in_db = Task.objects.get(pk=task.pk)
+        # Assert
+        self._assert_success_change_parameters_correctly(parameters, response, task_in_db)
+
+    def test_change_task___i_assign_with_good_parameters_but_is_locked___403(self):
+        # Arrange
+        parameters = {
+            'title': 'changed', 'detail': 'changed detail',
+            'due_date': '2100-10-10', 'status': 3, 'tag': 3}
+        task = Task.objects.filter(created_by=self.member_2, group_task__assignee=self.member_1).first()
+        task.group_task.lock_level = GroupTask.FULL_LOCK
+        task.group_task.save()
+        # Act
+        response = self.client.put(get_detail_task_url(task.pk), parameters)
+        # Assert
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
+        for column in parameters.keys():
+            self.assertTrue(column in response.data['detail'], column)
+
+    def _assert_success_change_parameters_correctly(self, parameters, response, task_in_db):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         for key, value in parameters.items():
             with self.subTest(key=key, value=value):
@@ -45,7 +76,7 @@ class ChangeTaskTestCase(BaseTaskTestCase):
             'completed': True, 'completed_date': '2010-10-11',
             'created_date': '2010-10-10', 'created_by': 3
         }
-        task = Task.objects.all()[0]
+        task = Task.objects.first()
         # Act
         response = self.client.patch(get_detail_task_url(task.pk), parameters)
         task_in_db = Task.objects.get(pk=task.pk)
@@ -54,18 +85,32 @@ class ChangeTaskTestCase(BaseTaskTestCase):
 
     def test_complete_task___target_is_not_completed_task___200_and_task_is_completed(self):
         # Arrange
-        task = Task.objects.all()[0]
+        task = Task.objects.first()
+        un_complete_task(self.member_1, task.pk)
         # Act
         response = self.client.patch(get_complete_task_url(task.pk))
         task = Task.objects.get(pk=task.pk)
         # Assert
+        self._assert_success_complete_task(response, task)
+
+    def _assert_success_complete_task(self, response, task):
         self.assertEqual(status.HTTP_200_OK, response.status_code, response.data)
         self.assertEqual(True, task.completed)
         self.assertEqual(timezone.now().date(), task.completed_date)
 
+    def test_complete_task___i_assign_task___200_and_task_is_completed(self):
+        # Arrange
+        task = Task.objects.filter(created_by=self.member_2, group_task__assignee=self.member_1).first()
+        un_complete_task(self.member_1, task.pk)
+        # Act
+        response = self.client.patch(get_complete_task_url(task.pk))
+        task = Task.objects.get(pk=task.pk)
+        # Assert
+        self._assert_success_complete_task(response, task)
+
     def test_un_complete_task___target_is_not_completed_task___200_and_task_is_completed(self):
         # Arrange
-        task = Task.objects.all()[0]
+        task = Task.objects.first()
         complete_task(self.member_1, task.pk)
         # Act
         response = self.client.patch(get_un_complete_task_url(task.pk))
@@ -74,6 +119,16 @@ class ChangeTaskTestCase(BaseTaskTestCase):
         self.assertEqual(status.HTTP_200_OK, response.status_code, response.data)
         self.assertEqual(False, task.completed)
         self.assertEqual(None, task.completed_date)
+
+    def test_complete_task___is_group_task_and_locked___403(self):
+        # Arrange
+        task = Task.objects.filter(created_by=self.member_2, group_task__assignee=self.member_1).first()
+        task.group_task.lock_level = GroupTask.COMPLETED_LOCK
+        task.group_task.save()
+        # Act
+        response = self.client.patch(get_complete_task_url(task.pk))
+        # Assert
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code, response.data)
 
     def test_change_task___set_value_wrong_data___validation_failed(self):
         # Arrange
@@ -102,7 +157,7 @@ class ChangeTaskTestCase(BaseTaskTestCase):
         # SubTest
         for test_data in test_data_list:
             with self.subTest(parameters=test_data['parameters'], validation_errors=test_data['validation_errors']):
-                task = Task.objects.all()[0]
+                task = Task.objects.first()
                 # Act
                 response = self.client.put(get_detail_task_url(task.pk), test_data['parameters'])
                 # Assert
@@ -114,7 +169,7 @@ class ChangeTaskTestCase(BaseTaskTestCase):
     def test_change_task___without_authentication___404(self):
         # Arrange
         self.client.logout()
-        task = Task.objects.all()[0]
+        task = Task.objects.first()
         # Act
         response = self.client.put(get_detail_task_url(task.pk))
         # Assert
