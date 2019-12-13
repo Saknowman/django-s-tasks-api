@@ -25,8 +25,11 @@ DEFAULTS = {
         'rest_framework.permissions.IsAuthenticated',
         's_tasks_api.permissions.tasks.IsMyOrMyGroupTask',
         's_tasks_api.permissions.tasks.IsDeletableGroupTask',
+        's_tasks_api.permissions.tasks.AreParametersChangeableGroupTask',
+        's_tasks_api.permissions.tasks.IsChangeableTaskComplete',
         's_tasks_api.permissions.common.IsUserInGroup',
-        's_tasks_api.permissions.tasks.IsAssigneeInTaskGroup'
+        's_tasks_api.permissions.tasks.IsAssigneeInTaskGroup',
+        's_tasks_api.permissions.tasks.IsChangeableTaskAssignee'
     ],
     'TASK_STATUS_PERMISSION_CLASSES': ['rest_framework.permissions.IsAdminUser'],
     'TASK_TAG_PERMISSION_CLASSES': [

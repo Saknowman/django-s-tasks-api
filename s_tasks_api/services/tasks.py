@@ -4,7 +4,10 @@ from ..models import Task, GroupTask
 
 
 def get_task(user, pk):
-    return Task.objects.filter(created_by=user, pk=pk).get()
+    task = Task.objects.filter(pk=pk).get()
+    if is_my_task(user, task) or is_my_group_task(user, task):
+        return task
+    raise Task.DoesNotExist()
 
 
 def get_tasks(user, tasks=None):
@@ -78,7 +81,42 @@ def un_complete_task(user, pk):
 def is_deletable_task(user, task):
     if is_my_task(user, task):
         return True
-    task = convert_group_task(task)
-    if task is None:
+    group_task = convert_group_task(task)
+    if group_task is None:
+        return False
+    return not (group_task.lock_level & GroupTask.DELETE_LOCK)
+
+
+def is_completable_task(user, task):
+    if is_my_task(user, task):
         return True
-    return not (task.lock_level & GroupTask.DELETE_LOCK)
+    group_task = convert_group_task(task)
+    if group_task is None:
+        return False
+    return not (group_task.lock_level & GroupTask.COMPLETED_LOCK)
+
+
+def is_assignable_task(user, task):
+    group_task = convert_group_task(task)
+    if group_task is None:
+        return False
+    if is_my_task(user, task):
+        return not (group_task.assign_lock_level & GroupTask.ASSIGN_LOCK_CREATED_USER)
+    if user == group_task.assignee:
+        return not (group_task.assign_lock_level & GroupTask.ASSIGN_LOCK_ASSIGNEE)
+    return not (group_task.assign_lock_level & GroupTask.ASSIGN_LOCK_MEMBERS)
+
+
+def list_unchangeable_group_task_columns_by_member(group_task: GroupTask):
+    bits_and_columns = {
+        GroupTask.TITLE_LOCK: 'title',
+        GroupTask.DETAIL_LOCK: 'detail',
+        GroupTask.DUE_DATE_LOCK: 'due_date',
+        GroupTask.STATUS_LOCK: 'status',
+        GroupTask.TAG_LOCK: 'tag',
+    }
+    result = []
+    for bit, column in bits_and_columns.items():
+        if bit & group_task.lock_level:
+            result.append(column)
+    return result

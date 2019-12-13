@@ -75,6 +75,21 @@
     }
   },
   {
+    "model": "s_tasks_api.task",
+    "pk": 6,
+    "fields": {
+      "title": "title5",
+      "detail": "detail5",
+      "due_date": "2020-03-13",
+      "status": 1,
+      "tag": 2,
+      "created_date": "2019-12-11",
+      "completed": false,
+      "completed_date": null,
+      "created_by": 2
+    }
+  },
+  {
     "model": "s_tasks_api.grouptask",
     "pk": 1,
     "fields": {

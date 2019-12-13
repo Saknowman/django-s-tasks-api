@@ -52,13 +52,15 @@ class TaskViewSet(Response403To401Mixin, viewsets.ModelViewSet):
 
     @action(detail=True, methods=['patch'])
     def complete(self, request, *args, **kwargs):
-        task = complete_task(request.user, kwargs['pk'])
+        task = self.get_object()
+        task = complete_task(request.user, task.pk)
         serializer = self.get_serializer(task)
         return Response(serializer.data)
 
     @action(detail=True, methods=['patch'])
     def un_complete(self, request, *args, **kwargs):
-        task = un_complete_task(request.user, kwargs['pk'])
+        task = self.get_object()
+        task = un_complete_task(request.user, task.pk)
         serializer = self.get_serializer(task)
         return Response(serializer.data)
 
@@ -85,7 +87,33 @@ class GroupTaskViewSet(Response403To401Mixin, viewsets.ModelViewSet):
     def get_queryset(self):
         return get_group_tasks(self.request.user, self.queryset)
 
+    def update(self, request, *args, **kwargs):
+        kwargs['partial'] = True
+        return super().update(request, *args, **kwargs)
+
+    def perform_update(self, serializer):
+        with transaction.atomic():
+            task_serializer = TaskSerializer(serializer.instance.task, data=self.request.data,
+                                             partial=serializer.partial)
+            task_serializer.is_valid(raise_exception=True)
+            task_serializer.save()
+            serializer.save()
+
     def perform_destroy(self, instance):
         with transaction.atomic():
             instance.task.delete()
             instance.delete()
+
+    @action(detail=True, methods=['patch'])
+    def complete(self, request, *args, **kwargs):
+        group_task = self.get_object()
+        task = complete_task(request.user, group_task.task.pk)
+        task_serializer = TaskSerializer(task)
+        return Response(task_serializer.data)
+
+    @action(detail=True, methods=['patch'])
+    def un_complete(self, request, *args, **kwargs):
+        group_task = self.get_object()
+        task = un_complete_task(request.user, group_task.task.pk)
+        task_serializer = TaskSerializer(task)
+        return Response(task_serializer.data)

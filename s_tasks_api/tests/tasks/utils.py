@@ -5,12 +5,14 @@ from ..utils import BaseApiTestCase, User
 
 LIST_TASK_URL = reverse('tasks:tasks-list')
 ADD_TASK_URL = reverse('tasks:tasks-list')
-CREATE_GROUP_TASK_URL = reverse('tasks:tasks-create-group-task')
 DETAIL_TASK_URL_NAME = 'tasks:tasks-detail'
 COMPLETE_TASK_URL_NAME = 'tasks:tasks-complete'
 UN_COMPLETE_TASK_URL_NAME = 'tasks:tasks-un-complete'
+CREATE_GROUP_TASK_URL = reverse('tasks:tasks-create-group-task')
 LIST_GROUP_TASK_URL = reverse('tasks:group-tasks-list')
 DETAIL_GROUP_TASK_URL = 'tasks:group-tasks-detail'
+COMPLETE_GROUP_TASK_URL_NAME = 'tasks:group-tasks-complete'
+UN_COMPLETE_GROUP_TASK_URL_NAME = 'tasks:group-tasks-un-complete'
 
 
 def get_detail_task_url(pk):
@@ -27,6 +29,14 @@ def get_complete_task_url(pk):
 
 def get_un_complete_task_url(pk):
     return reverse(UN_COMPLETE_TASK_URL_NAME, args=[pk])
+
+
+def get_complete_group_task_url(pk):
+    return reverse(COMPLETE_GROUP_TASK_URL_NAME, args=[pk])
+
+
+def get_un_complete_group_task_url(pk):
+    return reverse(UN_COMPLETE_GROUP_TASK_URL_NAME, args=[pk])
 
 
 class BaseTaskTestCase(BaseApiTestCase):
@@ -61,6 +71,9 @@ class BaseGroupTaskTestCase(BaseApiTestCase):
         }
         self.member_1 = User.objects.get(username='group1_member1')
         self.member_2 = User.objects.get(username='group1_member2')
+        self.member_3 = User.objects.get(username='group1_member3')
+        self.both_group_member = User.objects.get(username='group1_and_2_member')
+        self.group_2_member = User.objects.get(username='group2_member1')
         self.group_1 = self.get_groups()[0]
         self.group_2 = self.get_groups()[1]
         self.client.force_login(self.member_1)

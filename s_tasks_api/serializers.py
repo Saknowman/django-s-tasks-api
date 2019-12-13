@@ -39,3 +39,14 @@ class GroupTaskSerializer(serializers.ModelSerializer):
         model = GroupTask
         fields = ('pk', 'task', 'task_id', 'group', 'assignee', 'lock_level', 'assign_lock_level')
         read_only_fields = ('pk',)
+
+    def update(self, instance, validated_data):
+        """
+        task and group are not changeable.
+        """
+        default_task = instance.task
+        default_group = instance.group
+        result = super().update(instance, validated_data)
+        result.task = default_task
+        result.group = default_group
+        return result
