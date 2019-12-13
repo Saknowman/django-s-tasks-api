@@ -5,7 +5,7 @@ from rest_framework import status
 from s_tasks_api.models import TaskStatus, Task, GroupTask
 from s_tasks_api.tests.utils import validation_error_status, User
 from ...settings import api_settings
-from .utils import BaseTaskTestCase, ADD_TASK_URL, BaseGroupTaskTestCase, CREATE_GROUP_TASK_URL, LIST_GROUP_TASK_URL
+from .utils import BaseTaskTestCase, ADD_TASK_URL, CREATE_GROUP_TASK_URL, LIST_GROUP_TASK_URL
 
 
 class AddTaskTestCase(BaseTaskTestCase):
@@ -28,7 +28,7 @@ class AddTaskTestCase(BaseTaskTestCase):
         self.assertTrue('pk' in response.data.keys(), response.data)
         task = Task.objects.get(pk=response.data['pk'])
         self.assertEqual(status.HTTP_201_CREATED, response.status_code, response.data)
-        self.assertEqual(self.user_1, task.created_by)
+        self.assertEqual(self.member_1, task.created_by)
         for k, v in parameters.items():
             with self.subTest(k=k, v=v):
                 if k is 'status' or k is 'tag':
@@ -96,7 +96,7 @@ class AddTaskTestCase(BaseTaskTestCase):
                 self.assertEqual(value, task.__getattribute__(key))
 
 
-class AddGroupTaskTestCase(BaseGroupTaskTestCase):
+class AddGroupTaskTestCase(BaseTaskTestCase):
     fixtures = ['test_group_users.json', 'default_task_status_data.json', 'test_task_tags_data.json',
                 'test_tasks_data.json']
 

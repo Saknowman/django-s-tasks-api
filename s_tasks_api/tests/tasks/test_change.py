@@ -6,7 +6,7 @@ from s_tasks_api.services.tasks import get_tasks, complete_task
 from s_tasks_api.settings import api_settings
 from s_tasks_api.tests.utils import validation_error_status
 from .utils import BaseTaskTestCase, get_detail_task_url, get_complete_task_url, get_un_complete_task_url, \
-    BaseGroupTaskTestCase, get_detail_group_task_url, get_complete_group_task_url, get_un_complete_group_task_url
+    get_detail_group_task_url, get_complete_group_task_url, get_un_complete_group_task_url
 
 
 def _assert_task_is_not_changed_some_columns(test_case, task_in_db, response):
@@ -66,7 +66,7 @@ class ChangeTaskTestCase(BaseTaskTestCase):
     def test_un_complete_task___target_is_not_completed_task___200_and_task_is_completed(self):
         # Arrange
         task = Task.objects.all()[0]
-        complete_task(self.user_1, task.pk)
+        complete_task(self.member_1, task.pk)
         # Act
         response = self.client.patch(get_un_complete_task_url(task.pk))
         task = Task.objects.get(pk=task.pk)
@@ -128,14 +128,14 @@ class ChangeTaskTestCase(BaseTaskTestCase):
 
     def test_change_task___not_my_task___404(self):
         # Arrange
-        not_my_task = get_tasks(self.user_2)[0]
+        not_my_task = get_tasks(self.member_2)[0]
         # Act
         response = self.client.put(get_detail_task_url(not_my_task.pk))
         # Assert
         self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
 
 
-class ReadGroupTaskTestCase(BaseGroupTaskTestCase):
+class ReadGroupTaskTestCase(BaseTaskTestCase):
 
     def test_change_group_task___without_authentication___404(self):
         # Arrange

@@ -2,7 +2,7 @@ from rest_framework import status
 
 from s_tasks_api.models import Task, GroupTask
 from s_tasks_api.services.tasks import get_tasks
-from .utils import BaseTaskTestCase, get_detail_task_url, BaseGroupTaskTestCase, get_detail_group_task_url
+from .utils import BaseTaskTestCase, get_detail_task_url, get_detail_group_task_url
 
 
 class DeleteTaskTestCase(BaseTaskTestCase):
@@ -32,14 +32,14 @@ class DeleteTaskTestCase(BaseTaskTestCase):
 
     def test_delete_task___not_my_task___404(self):
         # Arrange
-        not_my_task = get_tasks(self.user_2)[0]
+        not_my_task = get_tasks(self.member_2)[0]
         # Act
         response = self.client.delete(get_detail_task_url(not_my_task.pk))
         # Assert
         self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
 
 
-class DeleteGroupTaskTestCase(BaseGroupTaskTestCase):
+class DeleteGroupTaskTestCase(BaseTaskTestCase):
     def test_delete_group_task___without_authentication___404(self):
         # Arrange
         self.client.logout()

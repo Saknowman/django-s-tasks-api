@@ -2,7 +2,7 @@ from rest_framework import status
 
 from s_tasks_api.models import Task, GroupTask
 from s_tasks_api.services.tasks import get_tasks
-from .utils import BaseTaskTestCase, LIST_TASK_URL, get_detail_task_url, BaseGroupTaskTestCase, \
+from .utils import BaseTaskTestCase, LIST_TASK_URL, get_detail_task_url, \
     get_detail_group_task_url, LIST_GROUP_TASK_URL
 
 
@@ -26,7 +26,7 @@ class ReadTaskTestCase(BaseTaskTestCase):
 
     def test_list_tasks___there_are_some_users_tasks___get_tasks_which_created_by_user(self):
         # Arrange
-        users = [self.user_1, self.user_2]
+        users = [self.member_1, self.member_2]
         for user in users:
             with self.subTest(user=user):
                 self.client.force_login(user)
@@ -45,7 +45,7 @@ class ReadTaskTestCase(BaseTaskTestCase):
 
     def test_detail_task___not_my_task___404(self):
         # Arrange
-        not_my_task = get_tasks(self.user_2)[0]
+        not_my_task = get_tasks(self.member_2)[0]
         # Act
         response = self.client.get(get_detail_task_url(not_my_task.pk))
         # Assert
@@ -53,14 +53,14 @@ class ReadTaskTestCase(BaseTaskTestCase):
 
     def test_detail_task___my_task___200(self):
         # Arrange
-        my_task = get_tasks(self.user_1)[0]
+        my_task = get_tasks(self.member_1)[0]
         # Act
         response = self.client.get(get_detail_task_url(my_task.pk))
         # Assert
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
 
-class ReadGroupTaskTestCase(BaseGroupTaskTestCase):
+class ReadGroupTaskTestCase(BaseTaskTestCase):
     def test_list_group_tasks___without_authentication___404(self):
         # Arrange
         self.client.logout()
