@@ -1,11 +1,13 @@
+from django.contrib.auth.models import Group
 from rest_framework import status
 
-from s_tasks_api.models import Task
+from s_tasks_api.models import Task, GroupTask
 from s_tasks_api.services.tasks import get_tasks
-from .utils import BaseTaskTestCase, LIST_TASK_URL, get_detail_task_url
+from .utils import BaseTaskTestCase, LIST_TASK_URL, get_detail_task_url, BaseGroupTaskTestCase, \
+    get_detail_group_task_url, LIST_GROUP_TASK_URL
 
 
-class AddTaskTestCase(BaseTaskTestCase):
+class ReadTaskTestCase(BaseTaskTestCase):
     def test_list_tasks___without_authentication___404(self):
         # Arrange
         self.client.logout()
@@ -57,3 +59,56 @@ class AddTaskTestCase(BaseTaskTestCase):
         response = self.client.get(get_detail_task_url(my_task.pk))
         # Assert
         self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+
+class ReadGroupTaskTestCase(BaseGroupTaskTestCase):
+    def test_list_group_tasks___without_authentication___404(self):
+        # Arrange
+        self.client.logout()
+        # Act
+        response = self.client.get(LIST_GROUP_TASK_URL)
+        # Assert
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
+
+    def test_detail_group_task___without_authentication___404(self):
+        # Arrange
+        self.client.logout()
+        group_task = GroupTask.objects.first()
+        # Act
+        response = self.client.get(get_detail_group_task_url(group_task.pk))
+        # Assert
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
+
+    def test_list_group_tasks___with_authentication___200_list_only_my_group_tasks(self):
+        # Arrange
+        expected_group_tasks_pk = [group_task.pk for group_task in
+                                   GroupTask.objects.filter(
+                                       group__in=[group.pk for group in self.member_1.groups.all()]).all()]
+        # Act
+        response = self.client.get(LIST_GROUP_TASK_URL)
+        # Assert
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertListEqual(expected_group_tasks_pk, [d['pk'] for d in response.data])
+
+    def test_detail_group_task___my_group_task___200(self):
+        # Arrange
+        group_task = GroupTask.objects.filter(group=self.group_1.pk).first()
+        # Act
+        response = self.client.get(get_detail_group_task_url(group_task.pk))
+        # Assert
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual(group_task.pk, response.data['pk'])
+
+    def test_detail_group_task___no_my_group_tasks___404(self):
+        # Arrange
+        other_group_task = GroupTask.objects.exclude(group=self.group_1.pk).first()
+        # Act
+        response = self.client.get(get_detail_group_task_url(other_group_task.pk))
+        # Assert
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
+
+    def test_detail_groupt_task___not_exists_pk___404(self):
+        # Act
+        response = self.client.get(get_detail_group_task_url(999))
+        # Assert
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)

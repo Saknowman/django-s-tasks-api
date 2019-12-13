@@ -97,6 +97,9 @@ class AddTaskTestCase(BaseTaskTestCase):
 
 
 class AddGroupTaskTestCase(BaseGroupTaskTestCase):
+    fixtures = ['test_group_users.json', 'default_task_status_data.json', 'test_task_tags_data.json',
+                'test_tasks_data.json']
+
     def test_add_task___group_in_parameters___return_201_insert_at_db(self):
         # Arrange
         group_member = self.get_group_users('task_group_1').last()

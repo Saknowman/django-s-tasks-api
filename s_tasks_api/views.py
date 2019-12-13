@@ -5,7 +5,7 @@ from rest_framework import viewsets, exceptions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from s_tasks_api.services.tasks import get_tasks, complete_task, un_complete_task
+from s_tasks_api.services.tasks import get_tasks, complete_task, un_complete_task, get_group_tasks
 from s_tasks_api.settings import api_settings
 from .models import Task, TaskStatus, TaskTag, GroupTask
 from .serializers import TaskSerializer, TaskStatusSerializer, TaskTagSerializer, GroupTaskSerializer
@@ -81,3 +81,6 @@ class GroupTaskViewSet(Response403To401Mixin, viewsets.ModelViewSet):
     queryset = GroupTask.objects.all()
     serializer_class = GroupTaskSerializer
     permission_classes = [import_string(p_c) for p_c in api_settings.GROUP_TASK_PERMISSION_CLASSES]
+
+    def get_queryset(self):
+        return get_group_tasks(self.request.user, self.queryset)

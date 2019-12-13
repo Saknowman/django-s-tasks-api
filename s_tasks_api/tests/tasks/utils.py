@@ -6,14 +6,19 @@ from ..utils import BaseApiTestCase, User
 LIST_TASK_URL = reverse('tasks:tasks-list')
 ADD_TASK_URL = reverse('tasks:tasks-list')
 CREATE_GROUP_TASK_URL = reverse('tasks:tasks-create-group-task')
-LIST_GROUP_TASK_URL = reverse('tasks:group-tasks-list')
 DETAIL_TASK_URL_NAME = 'tasks:tasks-detail'
 COMPLETE_TASK_URL_NAME = 'tasks:tasks-complete'
 UN_COMPLETE_TASK_URL_NAME = 'tasks:tasks-un-complete'
+LIST_GROUP_TASK_URL = reverse('tasks:group-tasks-list')
+DETAIL_GROUP_TASK_URL = 'tasks:group-tasks-detail'
 
 
 def get_detail_task_url(pk):
     return reverse(DETAIL_TASK_URL_NAME, args=[pk])
+
+
+def get_detail_group_task_url(pk):
+    return reverse(DETAIL_GROUP_TASK_URL, args=[pk])
 
 
 def get_complete_task_url(pk):
@@ -37,7 +42,7 @@ class BaseTaskTestCase(BaseApiTestCase):
 
 class BaseGroupTaskTestCase(BaseApiTestCase):
     fixtures = ['test_group_users.json', 'default_task_status_data.json', 'test_task_tags_data.json',
-                'test_tasks_data.json']
+                'test_group_tasks_data.json']
 
     def setUp(self):
         super().setUp()

@@ -45,7 +45,8 @@ class GroupTask(models.Model):
     STATUS_LOCK = 0b1 << 3
     TAG_LOCK = 0b1 << 4
     COMPLETED_LOCK = 0b1 << 5
-    FULL_LOCK = NON_LOCK | TITLE_LOCK | DETAIL_LOCK | DUE_DATE_LOCK | STATUS_LOCK | TAG_LOCK | COMPLETED_LOCK
+    DELETE_LOCK = 0b1 << 6
+    FULL_LOCK = NON_LOCK | TITLE_LOCK | DETAIL_LOCK | DUE_DATE_LOCK | STATUS_LOCK | TAG_LOCK | COMPLETED_LOCK | DELETE_LOCK
 
     # Assign Lock Level
     ASSIGN_LOCK_NON = 0b0
@@ -62,11 +63,30 @@ class GroupTask(models.Model):
         validators.MinValueValidator(NON_LOCK),
         validators.MaxValueValidator(FULL_LOCK)
     ])
-    assign_lock_level = models.IntegerField(default=ASSIGN_LOCK_NON,
-                                            validators=[
-                                                validators.MinValueValidator(ASSIGN_LOCK_MEMBERS),
-                                                validators.MaxValueValidator(ASSIGN_FULL_LOCK)
-                                            ])
+    assign_lock_level = models.IntegerField(default=ASSIGN_LOCK_NON, validators=[
+        validators.MinValueValidator(ASSIGN_LOCK_NON),
+        validators.MaxValueValidator(ASSIGN_FULL_LOCK)
+    ])
+
+    LOCK_LEVELS = {
+        'NON_LOCK': NON_LOCK,
+        'TITLE_LOCK': TITLE_LOCK,
+        'DETAIL_LOCK': DETAIL_LOCK,
+        'DUE_DATE_LOCK': DUE_DATE_LOCK,
+        'STATUS_LOCK': STATUS_LOCK,
+        'TAG_LOCK': TAG_LOCK,
+        'COMPLETED_LOCK': COMPLETED_LOCK,
+        'DELETE_LOCK': DELETE_LOCK,
+        'FULL_LOCK': FULL_LOCK,
+    }
+
+    ASSIGN_LOCK_LEVELS = {
+        'ASSIGN_LOCK_NON': ASSIGN_LOCK_NON,
+        'ASSIGN_LOCK_MEMBERS': ASSIGN_LOCK_MEMBERS,
+        'ASSIGN_LOCK_ASSIGNEE': ASSIGN_LOCK_ASSIGNEE,
+        'ASSIGN_LOCK_CREATED_USER': ASSIGN_LOCK_CREATED_USER,
+        'ASSIGN_FULL_LOCK': ASSIGN_FULL_LOCK,
+    }
 
     def __str__(self):
         return self.group.name + ':' + self.task.title
