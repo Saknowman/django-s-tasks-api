@@ -84,3 +84,8 @@ class GroupTaskViewSet(Response403To401Mixin, viewsets.ModelViewSet):
 
     def get_queryset(self):
         return get_group_tasks(self.request.user, self.queryset)
+
+    def perform_destroy(self, instance):
+        with transaction.atomic():
+            instance.task.delete()
+            instance.delete()

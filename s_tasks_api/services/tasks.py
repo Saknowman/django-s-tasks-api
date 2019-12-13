@@ -29,13 +29,6 @@ def is_my_group_task(user, task):
     return group_task in get_group_tasks(user)
 
 
-def is_group_task_user(user, task):
-    group_task = convert_group_task(task)
-    if group_task is None:
-        return False
-    return group_task.group in user.groups.all()
-
-
 def get_created_user(task):
     raise_if_not_task_or_group_task(task)
     if type(task) is Task:
@@ -80,3 +73,12 @@ def un_complete_task(user, pk):
     task.completed_date = None
     task.save()
     return task
+
+
+def is_deletable_task(user, task):
+    if is_my_task(user, task):
+        return True
+    task = convert_group_task(task)
+    if task is None:
+        return True
+    return not (task.lock_level & GroupTask.DELETE_LOCK)

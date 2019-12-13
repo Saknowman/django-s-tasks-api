@@ -1,4 +1,3 @@
-from django.contrib.auth.models import Group
 from rest_framework import status
 
 from s_tasks_api.models import Task, GroupTask
@@ -107,7 +106,7 @@ class ReadGroupTaskTestCase(BaseGroupTaskTestCase):
         # Assert
         self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
 
-    def test_detail_groupt_task___not_exists_pk___404(self):
+    def test_detail_group_task___not_exists_pk___404(self):
         # Act
         response = self.client.get(get_detail_group_task_url(999))
         # Assert

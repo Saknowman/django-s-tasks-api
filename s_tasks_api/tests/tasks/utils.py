@@ -60,7 +60,9 @@ class BaseGroupTaskTestCase(BaseApiTestCase):
             }
         }
         self.member_1 = User.objects.get(username='group1_member1')
+        self.member_2 = User.objects.get(username='group1_member2')
         self.group_1 = self.get_groups()[0]
+        self.group_2 = self.get_groups()[1]
         self.client.force_login(self.member_1)
 
     def get_group_users_name(self, group_name):
