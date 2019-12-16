@@ -31,9 +31,7 @@ class ReadTaskTestCase(BaseTaskTestCase):
         for user in users:
             with self.subTest(user=user):
                 self.client.force_login(user)
-                expected_tasks = [task for task in Task.objects.filter(created_by=user.pk).all()]
-                expected_tasks += [group_task.task for group_task in GroupTask.objects.filter(assignee=user.pk).all()]
-                expected_tasks = set(expected_tasks)
+                expected_tasks = Task.objects.filter(Q(created_by=user.pk) | Q(group_task__assignee=user.pk))
                 # Act
                 response = self.client.get(LIST_TASK_URL)
                 # Assert
@@ -75,8 +73,6 @@ class ReadTaskTestCase(BaseTaskTestCase):
                 # Act
                 response = self.client.get(LIST_TASK_URL, conditions)
                 # Assert
-                print(conditions)
-                print(response.data)
                 self.assertEqual(status.HTTP_200_OK, response.status_code)
                 self.assertListEqual([task.pk for task in expect_result_tasks], [task['pk'] for task in response.data])
 
@@ -131,6 +127,52 @@ class ReadGroupTaskTestCase(BaseTaskTestCase):
         # Assert
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertListEqual(expected_group_tasks_pk, [d['pk'] for d in response.data])
+
+    def test_list_group_tasks___with_filter___filtered(self):
+        # Arrange
+        group_tasks = GroupTask.objects.filter(group__in=[group.pk for group in self.member_1.groups.all()])
+        print(group_tasks)
+        test_data_list = [
+            {'conditions': {'title': 'filter_title'},
+             'expect_result_group_tasks': group_tasks.filter(task__title__icontains='filter_title')},
+            {'conditions': {'detail': 'filter_detail'},
+             'expect_result_group_tasks': group_tasks.filter(task__detail__icontains='filter_detail')},
+            {'conditions': {'title': 'filter_title', 'detail': 'filter_detail'},
+             'expect_result_group_tasks': group_tasks.filter(task__title__icontains='filter_title', task__detail__icontains='filter_detail')},
+            {'conditions': {'due_date': '2020-01-01'},
+             'expect_result_group_tasks': group_tasks.filter(task__due_date__lte='2020-01-01')},
+            {'conditions': {'completed': True},
+             'expect_result_group_tasks': group_tasks.filter(task__completed=True)},
+            {'conditions': {'completed': False},
+             'expect_result_group_tasks': group_tasks.filter(task__completed=False)},
+            {'conditions': {'status': TaskStatus.objects.first().pk},
+             'expect_result_group_tasks': group_tasks.filter(task__status=TaskStatus.objects.first().pk)},
+            {'conditions': {'status': TaskStatus.objects.last().pk},
+             'expect_result_group_tasks': group_tasks.filter(task__status=TaskStatus.objects.last().pk)},
+            {'conditions': {'tag': TaskTag.objects.first().pk},
+             'expect_result_group_tasks': group_tasks.filter(task__tag=TaskTag.objects.first().pk)},
+            {'conditions': {'tag': TaskTag.objects.last().pk},
+             'expect_result_group_tasks': group_tasks.filter(task__tag=TaskTag.objects.last().pk)},
+            {'conditions': {'created_by': self.member_1.pk},
+             'expect_result_group_tasks': group_tasks.filter(task__created_by=self.member_1.pk)},
+            {'conditions': {'created_by': self.member_2.pk},
+             'expect_result_group_tasks': group_tasks.filter(task__created_by=self.member_2.pk)},
+            {'conditions': {'assignee': self.member_1.pk},
+             'expect_result_group_tasks': group_tasks.filter(assignee=self.member_1.pk)},
+            {'conditions': {'assignee': self.member_2.pk},
+             'expect_result_group_tasks': group_tasks.filter(assignee=self.member_2.pk)},
+
+        ]
+        # Sub Test
+        for test_data in test_data_list:
+            conditions = test_data['conditions']
+            expect_result_group_tasks = test_data['expect_result_group_tasks'].all()
+            with self.subTest(conditions=conditions, expect_result_group_tasks=expect_result_group_tasks):
+                # Act
+                response = self.client.get(LIST_GROUP_TASK_URL, conditions)
+                # Assert
+                self.assertEqual(status.HTTP_200_OK, response.status_code)
+                self.assertListEqual([task.pk for task in expect_result_group_tasks], [task['pk'] for task in response.data])
 
     def test_detail_group_task___my_group_task___200(self):
         # Arrange
