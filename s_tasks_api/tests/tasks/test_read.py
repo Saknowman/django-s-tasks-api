@@ -1,4 +1,3 @@
-from django.db.models import Q
 from rest_framework import status
 
 from s_tasks_api.models import Task, GroupTask
