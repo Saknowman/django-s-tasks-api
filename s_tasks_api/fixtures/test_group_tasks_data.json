@@ -1,0 +1,147 @@
+[
+  {
+    "model": "s_tasks_api.task",
+    "pk": 1,
+    "fields": {
+      "title": "title1",
+      "detail": "detail1",
+      "due_date": "2020-01-01",
+      "status": 1,
+      "tag": 1,
+      "created_date": "2019-12-11",
+      "completed": false,
+      "completed_date": null,
+      "created_by": 2
+    }
+  },
+  {
+    "model": "s_tasks_api.task",
+    "pk": 2,
+    "fields": {
+      "title": "title2",
+      "detail": "detail2",
+      "due_date": "2020-01-01",
+      "status": 2,
+      "tag": 2,
+      "created_date": "2019-12-11",
+      "completed": false,
+      "completed_date": null,
+      "created_by": 3
+    }
+  },
+  {
+    "model": "s_tasks_api.task",
+    "pk": 3,
+    "fields": {
+      "title": "title3",
+      "detail": "detail3",
+      "due_date": "2020-02-06",
+      "status": 1,
+      "tag": 1,
+      "created_date": "2019-12-11",
+      "completed": false,
+      "completed_date": null,
+      "created_by": 5
+    }
+  },
+  {
+    "model": "s_tasks_api.task",
+    "pk": 4,
+    "fields": {
+      "title": "title4",
+      "detail": "detail4",
+      "due_date": "2020-03-13",
+      "status": 4,
+      "tag": null,
+      "created_date": "2019-12-11",
+      "completed": true,
+      "completed_date": "2019-12-25",
+      "created_by": 3
+    }
+  },
+  {
+    "model": "s_tasks_api.task",
+    "pk": 5,
+    "fields": {
+      "title": "title5",
+      "detail": "detail5",
+      "due_date": "2020-03-13",
+      "status": 1,
+      "tag": 2,
+      "created_date": "2019-12-11",
+      "completed": false,
+      "completed_date": null,
+      "created_by": 5
+    }
+  },
+  {
+    "model": "s_tasks_api.task",
+    "pk": 6,
+    "fields": {
+      "title": "title5",
+      "detail": "detail5",
+      "due_date": "2020-03-13",
+      "status": 1,
+      "tag": 2,
+      "created_date": "2019-12-11",
+      "completed": false,
+      "completed_date": null,
+      "created_by": 2
+    }
+  },
+  {
+    "model": "s_tasks_api.grouptask",
+    "pk": 1,
+    "fields": {
+      "task": 1,
+      "group": 1,
+      "assignee": 2,
+      "lock_level": 0,
+      "assign_lock_level": 1
+    }
+  },
+  {
+    "model": "s_tasks_api.grouptask",
+    "pk": 2,
+    "fields": {
+      "task": 2,
+      "group": 1,
+      "assignee": 3,
+      "lock_level": 0,
+      "assign_lock_level": 0
+    }
+  },
+  {
+    "model": "s_tasks_api.grouptask",
+    "pk": 3,
+    "fields": {
+      "task": 3,
+      "group": 2,
+      "assignee": 6,
+      "lock_level": 0,
+      "assign_lock_level": 0
+    }
+  },
+  {
+    "model": "s_tasks_api.grouptask",
+    "pk": 4,
+    "fields": {
+      "task": 4,
+      "group": 1,
+      "assignee": 2,
+      "lock_level": 0,
+      "assign_lock_level": 0
+    }
+  },
+  {
+    "model": "s_tasks_api.grouptask",
+    "pk": 5,
+    "fields": {
+      "task": 5,
+      "group": 2,
+      "assignee": 5,
+      "lock_level": 0,
+      "assign_lock_level": 0
+    }
+  }
+]
