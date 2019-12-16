@@ -1,8 +1,8 @@
 from rest_framework import permissions
 
 from s_tasks_api.models import Task, GroupTask
-from s_tasks_api.services.tasks import is_my_task, is_my_group_task, is_deletable_task, convert_group_task, \
-    list_unchangeable_group_task_columns_by_member, is_completable_task, is_assignable_task, is_i_assignee
+from s_tasks_api.services.tasks import is_task_created_by, is_my_group_task, is_deletable_task, convert_group_task, \
+    list_unchangeable_group_task_columns_by_member, is_completable_task, is_assignable_task, am_i_assignee
 from s_tasks_api.services.utils import is_in_same_group, User
 
 
@@ -19,7 +19,7 @@ class IsMyTask(permissions.BasePermission):
         return self.has_object_permission(request, view, task)
 
     def has_object_permission(self, request, view, obj):
-        return is_my_task(request.user, obj) | is_i_assignee(request.user, obj)
+        return is_task_created_by(request.user, obj) | am_i_assignee(request.user, obj)
 
 
 class IsMyGroupTask(permissions.BasePermission):

@@ -13,6 +13,7 @@ LIST_GROUP_TASK_URL = reverse('tasks:group-tasks-list')
 DETAIL_GROUP_TASK_URL = 'tasks:group-tasks-detail'
 COMPLETE_GROUP_TASK_URL_NAME = 'tasks:group-tasks-complete'
 UN_COMPLETE_GROUP_TASK_URL_NAME = 'tasks:group-tasks-un-complete'
+REMOVE_TO_MY_TASK_URL_NAME = 'tasks:group-tasks-remove-to-my-task'
 
 
 def get_detail_task_url(pk):
@@ -37,6 +38,10 @@ def get_complete_group_task_url(pk):
 
 def get_un_complete_group_task_url(pk):
     return reverse(UN_COMPLETE_GROUP_TASK_URL_NAME, args=[pk])
+
+
+def get_remove_to_my_task_url(pk):
+    return reverse(REMOVE_TO_MY_TASK_URL_NAME, args=[pk])
 
 
 class BaseTaskTestCase(BaseApiTestCase):

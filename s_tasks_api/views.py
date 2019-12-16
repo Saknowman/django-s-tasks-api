@@ -5,7 +5,7 @@ from rest_framework import viewsets, exceptions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from s_tasks_api.services.tasks import get_tasks, complete_task, un_complete_task, get_group_tasks
+from s_tasks_api.services.tasks import get_tasks, complete_task, un_complete_task, get_group_tasks, is_task_created_by
 from s_tasks_api.settings import api_settings
 from .models import Task, TaskStatus, TaskTag, GroupTask
 from .serializers import TaskSerializer, TaskStatusSerializer, TaskTagSerializer, GroupTaskSerializer
@@ -117,3 +117,11 @@ class GroupTaskViewSet(Response403To401Mixin, viewsets.ModelViewSet):
         task = un_complete_task(request.user, group_task.task.pk)
         task_serializer = TaskSerializer(task)
         return Response(task_serializer.data)
+
+    @action(detail=True, methods=['delete'])
+    def remove_to_my_task(self, request, *args, **kwargs):
+        group_task = self.get_object()
+        if not is_task_created_by(request.user, group_task.task):
+            raise exceptions.PermissionDenied(detail='Only created user can remove from group to self task.')
+        group_task.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

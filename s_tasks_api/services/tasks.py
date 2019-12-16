@@ -5,7 +5,7 @@ from ..models import Task, GroupTask
 
 def get_task(user, pk):
     task = Task.objects.filter(pk=pk).get()
-    if is_my_task(user, task) or is_my_group_task(user, task):
+    if is_task_created_by(user, task) or is_my_group_task(user, task):
         return task
     raise Task.DoesNotExist()
 
@@ -20,12 +20,12 @@ def get_group_tasks(user, group_tasks=None):
     return group_tasks.filter(group__in=[group.pk for group in user.groups.all()])
 
 
-def is_my_task(user, task):
+def is_task_created_by(user, task):
     created_user = get_created_user(task)
     return user == created_user
 
 
-def is_i_assignee(user, task):
+def am_i_assignee(user, task):
     return task in [group_task.task for group_task in GroupTask.objects.filter(assignee=user).all()]
 
 
@@ -83,7 +83,7 @@ def un_complete_task(user, pk):
 
 
 def is_deletable_task(user, task):
-    if is_my_task(user, task):
+    if is_task_created_by(user, task):
         return True
     group_task = convert_group_task(task)
     if group_task is None:
@@ -92,7 +92,7 @@ def is_deletable_task(user, task):
 
 
 def is_completable_task(user, task):
-    if is_my_task(user, task):
+    if is_task_created_by(user, task):
         return True
     group_task = convert_group_task(task)
     if group_task is None:
@@ -104,7 +104,7 @@ def is_assignable_task(user, task):
     group_task = convert_group_task(task)
     if group_task is None:
         return False
-    if is_my_task(user, task):
+    if is_task_created_by(user, task):
         return not (group_task.assign_lock_level & GroupTask.ASSIGN_LOCK_CREATED_USER)
     if user == group_task.assignee:
         return not (group_task.assign_lock_level & GroupTask.ASSIGN_LOCK_ASSIGNEE)
