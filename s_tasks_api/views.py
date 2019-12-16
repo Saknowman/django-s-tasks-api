@@ -7,6 +7,7 @@ from rest_framework.response import Response
 
 from s_tasks_api.services.tasks import get_tasks, complete_task, un_complete_task, get_group_tasks, is_task_created_by
 from s_tasks_api.settings import api_settings
+from .filters import TaskFilterSet
 from .models import Task, TaskStatus, TaskTag, GroupTask
 from .serializers import TaskSerializer, TaskStatusSerializer, TaskTagSerializer, GroupTaskSerializer
 from .services.utils import add_items_at_query_dict
@@ -39,6 +40,7 @@ class TaskViewSet(Response403To401Mixin, viewsets.ModelViewSet):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
     permission_classes = [import_string(p_c) for p_c in api_settings.TASK_PERMISSION_CLASSES]
+    filter_class = TaskFilterSet
 
     def get_queryset(self):
         return get_tasks(self.request.user, self.queryset)

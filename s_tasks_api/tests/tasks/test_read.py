@@ -1,6 +1,7 @@
+from django.db.models import Q
 from rest_framework import status
 
-from s_tasks_api.models import Task, GroupTask
+from s_tasks_api.models import Task, GroupTask, TaskStatus, TaskTag
 from s_tasks_api.services.tasks import get_tasks
 from .utils import BaseTaskTestCase, LIST_TASK_URL, get_detail_task_url, \
     get_detail_group_task_url, LIST_GROUP_TASK_URL
@@ -39,6 +40,45 @@ class ReadTaskTestCase(BaseTaskTestCase):
                 self.assertEqual(len(expected_tasks), len(response.data), response.data)
                 for index, expected_task in enumerate(expected_tasks):
                     self.assertEqual(expected_task.pk, response.data[index]['pk'])
+
+    def test_list_tasks___with_filter___filtered(self):
+        # Arrange
+        tasks = Task.objects.filter(Q(created_by=self.member_1) | Q(group_task__assignee=self.member_1))
+        test_data_list = [
+            {'conditions': {'title': 'filter_title'},
+             'expect_result_tasks': tasks.filter(title__icontains='filter_title')},
+            {'conditions': {'detail': 'filter_detail'},
+             'expect_result_tasks': tasks.filter(detail__icontains='filter_detail')},
+            {'conditions': {'title': 'filter_title', 'detail': 'filter_detail'},
+             'expect_result_tasks': tasks.filter(title__icontains='filter_title', detail__icontains='filter_detail')},
+            {'conditions': {'due_date': '2020-01-01'},
+             'expect_result_tasks': tasks.filter(due_date__lte='2020-01-01')},
+            {'conditions': {'completed': True},
+             'expect_result_tasks': tasks.filter(completed=True)},
+            {'conditions': {'completed': False},
+             'expect_result_tasks': tasks.filter(completed=False)},
+            {'conditions': {'status': TaskStatus.objects.first().pk},
+             'expect_result_tasks': tasks.filter(status=TaskStatus.objects.first().pk)},
+            {'conditions': {'status': TaskStatus.objects.last().pk},
+             'expect_result_tasks': tasks.filter(status=TaskStatus.objects.last().pk)},
+            {'conditions': {'tag': TaskTag.objects.first().pk},
+             'expect_result_tasks': tasks.filter(tag=TaskTag.objects.first().pk)},
+            {'conditions': {'tag': TaskTag.objects.last().pk},
+             'expect_result_tasks': tasks.filter(tag=TaskTag.objects.last().pk)},
+
+        ]
+        # Sub Test
+        for test_data in test_data_list:
+            conditions = test_data['conditions']
+            expect_result_tasks = test_data['expect_result_tasks'].all()
+            with self.subTest(conditions=conditions, expect_result_tasks=expect_result_tasks):
+                # Act
+                response = self.client.get(LIST_TASK_URL, conditions)
+                # Assert
+                print(conditions)
+                print(response.data)
+                self.assertEqual(status.HTTP_200_OK, response.status_code)
+                self.assertListEqual([task.pk for task in expect_result_tasks], [task['pk'] for task in response.data])
 
     def test_detail_task___not_exists_pk___404(self):
         # Act
