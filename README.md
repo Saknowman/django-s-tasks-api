@@ -20,13 +20,14 @@ We need to hook **django-s-tasks-api** into our project.
     )
     ```
    
-2. Create **s_tasks_api** database table and load default data by running:
+2. Create **s_tasks_api** database table by running:
     ```shell script
     python manage.py migrate
-    python manage.py loaddata s_tasks_api/fixtures/default_task_status_data.json
     ```
+
+3. Register default task status refer to default_task_status_data.json
    
-3. Add url patterns at project.urls module:
+4. Add url patterns at project.urls module:
     ```python:project/urls.py
     from s_tasks_api import urls as s_tasks_api_urls
 
