@@ -15,7 +15,7 @@ router.routes.append(routers.DynamicRoute(
     initkwargs={}
 ))
 
-app_name = 'tasks'
+app_name = 's-tasks'
 urlpatterns = [
     path(r'', include(router.urls)),
 ]

@@ -5,11 +5,11 @@ from s_tasks_api.models import TaskTag
 from .utils import BaseApiTestCase, User, validation_error_status
 from ..settings import api_settings
 
-LIST_TASK_TAG_URL = reverse('tasks:tags-list')
+LIST_TASK_TAG_URL = reverse('s-tasks:tags-list')
 
 
 def detail_task_tag_url_by(pk):
-    return reverse('tasks:tags-detail', args=[pk])
+    return reverse('s-tasks:tags-detail', args=[pk])
 
 
 class BaseTaskTagTestCase(BaseApiTestCase):

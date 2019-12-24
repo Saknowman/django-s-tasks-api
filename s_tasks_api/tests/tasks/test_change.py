@@ -189,7 +189,7 @@ class ChangeTaskTestCase(BaseTaskTestCase):
         self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
 
 
-class ReadGroupTaskTestCase(BaseTaskTestCase):
+class ChangeGroupTaskTestCase(BaseTaskTestCase):
 
     def test_change_group_task___without_authentication___404(self):
         # Arrange

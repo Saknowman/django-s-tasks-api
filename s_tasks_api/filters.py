@@ -19,3 +19,4 @@ class GroupTaskFilterSet(filters.FilterSet):
     tag = filters.NumberFilter(field_name='task__tag')
     created_by = filters.NumberFilter(field_name='task__created_by')
     assignee = filters.NumberFilter(field_name='assignee')
+    group = filters.NumberFilter(field_name='group')

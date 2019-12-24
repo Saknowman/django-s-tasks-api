@@ -3,17 +3,17 @@ from django.urls import reverse
 
 from ..utils import BaseApiTestCase, User
 
-LIST_TASK_URL = reverse('tasks:tasks-list')
-ADD_TASK_URL = reverse('tasks:tasks-list')
-DETAIL_TASK_URL_NAME = 'tasks:tasks-detail'
-COMPLETE_TASK_URL_NAME = 'tasks:tasks-complete'
-UN_COMPLETE_TASK_URL_NAME = 'tasks:tasks-un-complete'
-CREATE_GROUP_TASK_URL = reverse('tasks:tasks-create-group-task')
-LIST_GROUP_TASK_URL = reverse('tasks:group-tasks-list')
-DETAIL_GROUP_TASK_URL = 'tasks:group-tasks-detail'
-COMPLETE_GROUP_TASK_URL_NAME = 'tasks:group-tasks-complete'
-UN_COMPLETE_GROUP_TASK_URL_NAME = 'tasks:group-tasks-un-complete'
-REMOVE_TO_MY_TASK_URL_NAME = 'tasks:group-tasks-remove-to-my-task'
+LIST_TASK_URL = reverse('s-tasks:tasks-list')
+ADD_TASK_URL = reverse('s-tasks:tasks-list')
+DETAIL_TASK_URL_NAME = 's-tasks:tasks-detail'
+COMPLETE_TASK_URL_NAME = 's-tasks:tasks-complete'
+UN_COMPLETE_TASK_URL_NAME = 's-tasks:tasks-un-complete'
+CREATE_GROUP_TASK_URL = reverse('s-tasks:tasks-create-group-task')
+LIST_GROUP_TASK_URL = reverse('s-tasks:group-tasks-list')
+DETAIL_GROUP_TASK_URL = 's-tasks:group-tasks-detail'
+COMPLETE_GROUP_TASK_URL_NAME = 's-tasks:group-tasks-complete'
+UN_COMPLETE_GROUP_TASK_URL_NAME = 's-tasks:group-tasks-un-complete'
+REMOVE_TO_MY_TASK_URL_NAME = 's-tasks:group-tasks-remove-to-my-task'
 
 
 def get_detail_task_url(pk):
