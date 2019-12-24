@@ -1,6 +1,7 @@
 from rest_framework import permissions
 
 from s_tasks_api.models import Task, GroupTask
+from s_tasks_api.permissions.common import AndAll, IsUserInGroup
 from s_tasks_api.services.tasks import is_task_created_by, is_my_group_task, is_deletable_task, convert_group_task, \
     list_unchangeable_group_task_columns_by_member, is_completable_task, is_assignable_task, am_i_assignee
 from s_tasks_api.services.utils import is_in_same_group, User
@@ -108,3 +109,30 @@ class IsAssigneeInTaskGroup(permissions.BasePermission):
 class IsMyOrMyGroupTask(permissions.OR):
     def __init__(self):
         super(IsMyOrMyGroupTask, self).__init__(IsMyTask(), IsMyGroupTask())
+
+
+class DefaultTaskPermissions(AndAll):
+    def __init__(self):
+        super().__init__([
+            permissions.IsAuthenticated(),
+            IsMyTask(),
+            IsUserInGroup(),
+            AreParametersChangeableGroupTask(),
+            IsDeletableGroupTask(),
+            IsChangeableTaskComplete(),
+            IsAssigneeInTaskGroup(),
+        ])
+
+
+class DefaultGroupTaskPermissions(AndAll):
+    def __init__(self):
+        super().__init__([
+            permissions.IsAuthenticated(),
+            IsMyOrMyGroupTask(),
+            AreParametersChangeableGroupTask(),
+            IsDeletableGroupTask(),
+            IsChangeableTaskComplete(),
+            IsUserInGroup(),
+            IsAssigneeInTaskGroup(),
+            IsChangeableTaskAssignee(),
+        ])
