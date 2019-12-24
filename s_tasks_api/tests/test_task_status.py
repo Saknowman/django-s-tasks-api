@@ -5,11 +5,11 @@ from s_tasks_api.models import TaskStatus
 from .utils import BaseApiTestCase, User, validation_error_status
 from ..settings import api_settings
 
-LIST_TASK_STATUS_URL = reverse('tasks:status-list')
+LIST_TASK_STATUS_URL = reverse('s-tasks:status-list')
 
 
 def detail_task_status_url_by(pk):
-    return reverse('tasks:status-detail', args=[pk])
+    return reverse('s-tasks:status-detail', args=[pk])
 
 
 class BaseTaskStatusTestCase(BaseApiTestCase):

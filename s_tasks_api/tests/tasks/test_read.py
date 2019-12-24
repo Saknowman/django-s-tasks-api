@@ -25,7 +25,7 @@ class ReadTaskTestCase(BaseTaskTestCase):
         # Assert
         self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
 
-    def test_list_tasks___there_are_some_users_tasks___get_tasks_which_created_by_user(self):
+    def test_list_tasks___there_are_some_users_tasks___get_tasks_which_created_by_user_or_assignee(self):
         # Arrange
         users = [self.member_1, self.member_2]
         for user in users:
@@ -161,6 +161,9 @@ class ReadGroupTaskTestCase(BaseTaskTestCase):
              'expect_result_group_tasks': group_tasks.filter(assignee=self.member_1.pk)},
             {'conditions': {'assignee': self.member_2.pk},
              'expect_result_group_tasks': group_tasks.filter(assignee=self.member_2.pk)},
+            {'conditions': {'group': self.group_1.pk},
+             'expect_result_group_tasks': group_tasks.filter(group=self.group_1.pk)},
+
 
         ]
         # Sub Test
